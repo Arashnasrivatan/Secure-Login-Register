@@ -17,10 +17,10 @@ This project ensures that all user data is handled securely 🔐, and includes f
 ## Demo
 
 ### Login 💎
-![demo](https://da.gd/RFuBu)
+![https://ibb.co/gRyg8m7](https://i.ibb.co/5RTc3G9/screencapture-localhost-login-login-php-2024-07-15-18-05-49.png)
 
 ### Sign up 💎
-![demo](https://da.gd/Vx6DsZ)
+![https://ibb.co/gRyg8m7](https://i.ibb.co/WVNnJ6L/screencapture-localhost-login-signup-php-2024-07-15-18-06-01.png)
 
 ## Features
 
