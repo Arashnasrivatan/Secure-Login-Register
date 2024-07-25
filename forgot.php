@@ -1,42 +1,53 @@
 <?php
+// Include the loader file which might contain necessary configurations and initializations
 include 'config/loader.php';
 
+// Check if the 'namefull' and 'mobile' cookies are set, and if so, redirect to the index page
 if(isset($_COOKIE['namefull']) && isset($_COOKIE['mobile'])){
   redirect("index.php");
 }
 
+// Check if the form is submitted with the 'forgotsubmit' action
 if(isset($_POST['forgotsubmit'])){
 
+  // Include the Validation helper for form validation
   require('helpers/Validation.php');
-$val = new Validation();
-$mobile = htmlspecialchars($_POST['mobile']);
+  $val = new Validation();
+  $mobile = htmlspecialchars($_POST['mobile']);
 
-$val->name('شماره موبایل')
-->value($mobile)
-->pattern('tel')
-->min(11)
-->max(11)
-->required()
-->isExist("users","mobile",$mobile);
+  // Validate the mobile number with specific rules
+  $val->name('شماره موبایل')
+      ->value($mobile)
+      ->pattern('tel') // Ensure the value matches a telephone pattern
+      ->min(11) // Minimum length of 11 characters
+      ->max(11) // Maximum length of 11 characters
+      ->required() // Field is required
+      ->isExist("users","mobile",$mobile); // Check if the mobile number exists in the 'users' table
 
-if($val->isSuccess()){
-  $token = bin2hex(random_bytes(16));
-  $sql = "UPDATE users SET reset_token = ? WHERE mobile = ?";
-  $stmt = $db->prepare($sql);
-  $stmt->bind_param("ss", $token, $mobile);
-  $stmt->execute();
+  // If validation is successful
+  if($val->isSuccess()){
+    // Generate a random token for password reset
+    $token = bin2hex(random_bytes(16));
 
-  // change it with your own url
-  $reset_link = getFullUrl() . "login/forgot-reset.php?token=" . $token;
+    // Update the user's record with the reset token
+    $sql = "UPDATE users SET reset_token = ? WHERE mobile = ?";
+    $stmt = $db->prepare($sql);
+    $stmt->bind_param("ss", $token, $mobile);
+    $stmt->execute();
 
-  // SMS SEND CODE HERE
-  $_SESSION['success'] = "لینک تغییر رمز عبور برای شما با موفقیت ارسال شد";
+    // Create a full URL for the password reset link
+    // change it with your own url
+    $reset_link = getFullUrl() . "login/forgot-reset.php?token=" . $token;
 
-}else{
-  $_SESSION['error'] = $val->displayError();
-}
+    // ----------------------
+    // SMS SEND CODE HERE
+    // ----------------------
+    $_SESSION['success'] = "لینک تغییر رمز عبور برای شما با موفقیت ارسال شد";
 
-
+  } else {
+    // If validation fails, store the error message in the session
+    $_SESSION['error'] = $val->displayError();
+  }
 }
 
 ?>
@@ -715,7 +726,7 @@ if($val->isSuccess()){
             fill="currentColor"
           ></path>
         </symbol>
-        <!-- twitter ri-twitter-x-fill -->
+
 
         <symbol id="twitter" viewBox="0 0 24 24">
           <path
@@ -723,21 +734,21 @@ if($val->isSuccess()){
             fill="currentColor"
           ></path>
         </symbol>
-        <!-- aparat simple-icons-aparat -->
+
         <symbol id="aparat" viewBox="0 0 24 24">
           <path
             d="M12.001 1.594c-9.27-.003-13.913 11.203-7.36 17.758a10.403 10.403 0 0 0 17.76-7.355c0-5.744-4.655-10.401-10.4-10.403zM6.11 6.783c.501-2.598 3.893-3.294 5.376-1.103c1.483 2.19-.422 5.082-3.02 4.582A2.97 2.97 0 0 1 6.11 6.783zm4.322 8.988c-.504 2.597-3.897 3.288-5.377 1.096c-1.48-2.192.427-5.08 3.025-4.579a2.97 2.97 0 0 1 2.352 3.483zm1.26-2.405c-1.152-.223-1.462-1.727-.491-2.387c.97-.66 2.256.18 2.04 1.334a1.32 1.32 0 0 1-1.548 1.053zm6.198 3.838c-.501 2.598-3.893 3.293-5.376 1.103c-1.484-2.191.421-5.082 3.02-4.583a2.97 2.97 0 0 1 2.356 3.48zm-1.967-5.502c-2.598-.501-3.293-3.896-1.102-5.38c2.19-1.483 5.081.422 4.582 3.02a2.97 2.97 0 0 1-3.48 2.36zM13.59 23.264l2.264.61a3.715 3.715 0 0 0 4.543-2.636l.64-2.402a11.383 11.383 0 0 1-7.448 4.428zm7.643-19.665L18.87 2.97a11.376 11.376 0 0 1 4.354 7.62l.65-2.459A3.715 3.715 0 0 0 21.231 3.6zM.672 13.809l-.541 2.04a3.715 3.715 0 0 0 2.636 4.543l2.107.562a11.38 11.38 0 0 1-4.203-7.145zM10.357.702L8.15.126a3.715 3.715 0 0 0-4.547 2.637l-.551 2.082A11.376 11.376 0 0 1 10.358.702Z"
             fill="currentColor"
           ></path>
         </symbol>
-        <!-- chevron down mdi-chevron-down -->
+
         <symbol id="chevron-down" viewBox="0 0 24 24">
           <path
             d="M7.41 8.58L12 13.17l4.59-4.59L18 10l-6 6l-6-6l1.41-1.42Z"
             fill="currentColor"
           ></path>
         </symbol>
-        <!-- chevron up mdi-chevron-up -->
+
 
         <symbol id="chevron-up" viewBox="0 0 24 24">
           <path
@@ -745,7 +756,7 @@ if($val->isSuccess()){
             fill="currentColor"
           ></path>
         </symbol>
-        <!-- chevron right mdi-chevron-right -->
+
 
         <symbol id="chevron-right" viewBox="0 0 24 24">
           <path
@@ -753,7 +764,7 @@ if($val->isSuccess()){
             fill="currentColor"
           ></path>
         </symbol>
-        <!-- chevron left mdi-chevron-left -->
+
 
         <symbol id="chevron-left" viewBox="0 0 24 24">
           <path
@@ -761,7 +772,7 @@ if($val->isSuccess()){
             fill="currentColor"
           ></path>
         </symbol>
-        <!-- dashboard radix-icons:dashboard -->
+
         <symbol id="dashboard" viewBox="0 0 15 15">
           <path
             clip-rule="evenodd"
@@ -770,7 +781,7 @@ if($val->isSuccess()){
             fill-rule="evenodd"
           ></path>
         </symbol>
-        <!-- burger heroicons:bars-3 -->
+
 
         <symbol id="menu" viewBox="0 0 24 24">
           <path
@@ -782,14 +793,14 @@ if($val->isSuccess()){
             stroke-width="1.5"
           ></path>
         </symbol>
-        <!--  Cart ph:shopping-cart-simple -->
+
         <symbol id="cart" viewBox="0 0 256 256">
           <path
             d="M96 216a16 16 0 1 1-16-16a16 16 0 0 1 16 16Zm88-16a16 16 0 1 0 16 16a16 16 0 0 0-16-16Zm47.65-125.65l-28.53 92.71A23.89 23.89 0 0 1 180.18 184H84.07A24.11 24.11 0 0 1 61 166.59L24.82 40H8a8 8 0 0 1 0-16h16.82a16.08 16.08 0 0 1 15.39 11.6L48.32 64H224a8 8 0 0 1 7.65 10.35ZM213.17 80H52.89l23.49 82.2a8 8 0 0 0 7.69 5.8h96.11a8 8 0 0 0 7.65-5.65Z"
             fill="currentColor"
           ></path>
         </symbol>
-        <!--  order solar:bag-3-linear -->
+
 
         <symbol id="order" viewBox="0 0 24 24">
           <g fill="none" stroke="currentColor" stroke-width="1.5">
@@ -803,7 +814,7 @@ if($val->isSuccess()){
           </g>
         </symbol>
 
-        <!--  heart ph:heart-straight -->
+
 
         <symbol id="heart" viewBox="0 0 256 256">
           <path
@@ -811,14 +822,14 @@ if($val->isSuccess()){
             fill="currentColor"
           ></path>
         </symbol>
-        <!-- mdi-heart-off-outline -->
+
         <symbol id="heart-off" viewBox="0 0 24 24">
           <path
             d="M2.39 1.73L1.11 3l2.08 2.08C2.45 6 2 7.19 2 8.5c0 3.77 3.4 6.86 8.55 11.53L12 21.35l1.45-1.32c.87-.79 1.69-1.53 2.45-2.24L20 22l1.27-1.27m-9.17-2.18l-.1.1l-.11-.1C7.14 14.24 4 11.39 4 8.5c0-.76.22-1.44.61-2l9.89 9.87c-.76.69-1.55 1.41-2.4 2.18M8.3 5.1L6.33 3.13C6.7 3.05 7.1 3 7.5 3c1.74 0 3.41.81 4.5 2.08C13.09 3.81 14.76 3 16.5 3C19.58 3 22 5.41 22 8.5c0 2.34-1.31 4.42-3.53 6.77l-1.41-1.41C18.91 11.88 20 10.2 20 8.5c0-2-1.5-3.5-3.5-3.5c-1.4 0-2.76.83-3.39 2h-2.22c-.51-.94-1.5-1.66-2.59-1.9Z"
             fill="currentColor"
           ></path>
         </symbol>
-        <!-- User solar:user-outline -->
+
         <symbol
           id="user"
           viewBox="0 0 24 24"
@@ -831,7 +842,7 @@ if($val->isSuccess()){
             fill-rule="evenodd"
           />
         </symbol>
-        <!-- Close -->
+
         <symbol
           aria-hidden="true"
           fill="currentColor"
@@ -845,7 +856,7 @@ if($val->isSuccess()){
             fill-rule="evenodd"
           ></path>
         </symbol>
-        <!-- Search  iconoir:search -->
+
         <symbol id="search" viewBox="0 0 24 24">
           <path
             d="m17 17l4 4M3 11a8 8 0 1 0 16 0a8 8 0 0 0-16 0Z"
@@ -863,7 +874,7 @@ if($val->isSuccess()){
           ></path>
         </symbol>
 
-        <!-- edit  solar:pen-new-square-broken -->
+
         <symbol id="edit" viewBox="0 0 24 24">
           <g
             fill="none"
@@ -879,14 +890,14 @@ if($val->isSuccess()){
             ></path>
           </g>
         </symbol>
-        <!-- notification  ph:bell -->
+
         <symbol id="notification" viewBox="0 0 256 256">
           <path
             d="M221.8 175.94c-5.55-9.56-13.8-36.61-13.8-71.94a80 80 0 1 0-160 0c0 35.34-8.26 62.38-13.81 71.94A16 16 0 0 0 48 200h40.81a40 40 0 0 0 78.38 0H208a16 16 0 0 0 13.8-24.06ZM128 216a24 24 0 0 1-22.62-16h45.24A24 24 0 0 1 128 216Zm-80-32c7.7-13.24 16-43.92 16-80a64 64 0 1 1 128 0c0 36.05 8.28 66.73 16 80Z"
             fill="currentColor"
           ></path>
         </symbol>
-        <!-- home solar-home-smile-linear -->
+
         <symbol id="home" viewBox="0 0 24 24">
           <g fill="none" stroke="currentColor" stroke-width="1">
             <path
@@ -898,14 +909,14 @@ if($val->isSuccess()){
             ></path>
           </g>
         </symbol>
-        <!-- shop solar-shop-2-outline -->
+
         <symbol id="shop" viewBox="0 0 24 24">
           <path
             d="M20.6 5.26a2.512 2.512 0 0 0-2.48-2.2H5.885a2.512 2.512 0 0 0-2.48 2.19l-.3 2.47a3.411 3.411 0 0 0 1.16 2.56v8.16a2.5 2.5 0 0 0 2.5 2.5h10.47a2.5 2.5 0 0 0 2.5-2.5v-8.16A3.411 3.411 0 0 0 20.9 7.72Zm-6.59 14.68h-4v-4.08a1.5 1.5 0 0 1 1.5-1.5h1a1.5 1.5 0 0 1 1.5 1.5Zm4.73-1.5a1.5 1.5 0 0 1-1.5 1.5h-2.23v-4.08a2.5 2.5 0 0 0-2.5-2.5h-1a2.5 2.5 0 0 0-2.5 2.5v4.08H6.765a1.5 1.5 0 0 1-1.5-1.5v-7.57a3.223 3.223 0 0 0 1.24.24a3.358 3.358 0 0 0 2.58-1.19a.241.241 0 0 1 .34 0a3.358 3.358 0 0 0 2.58 1.19A3.393 3.393 0 0 0 14.6 9.92a.219.219 0 0 1 .16-.07a.238.238 0 0 1 .17.07a3.358 3.358 0 0 0 2.58 1.19a3.173 3.173 0 0 0 1.23-.24Zm-1.23-8.33a2.386 2.386 0 0 1-1.82-.83a1.2 1.2 0 0 0-.92-.43h-.01a1.194 1.194 0 0 0-.92.42a2.476 2.476 0 0 1-3.65 0a1.24 1.24 0 0 0-1.86 0A2.405 2.405 0 0 1 4.1 7.78l.3-2.4a1.517 1.517 0 0 1 1.49-1.32h12.23a1.5 1.5 0 0 1 1.49 1.32l.29 2.36a2.392 2.392 0 0 1-2.395 2.37Z"
             fill="currentColor"
           ></path>
         </symbol>
-        <!-- contact ph-phone-call-light -->
+
 
         <symbol id="contact" viewBox="0 0 256 256">
           <path
@@ -913,7 +924,7 @@ if($val->isSuccess()){
             fill="currentColor"
           ></path>
         </symbol>
-        <!-- question ph-question-light -->
+
 
         <symbol id="question" viewBox="0 0 256 256">
           <path
@@ -921,7 +932,7 @@ if($val->isSuccess()){
             fill="currentColor"
           ></path>
         </symbol>
-        <!-- moon line-md-sunny-outline-to-moon-transition -->
+
         <symbol id="moon" viewBox="0 0 256 256">
           <path
             d="M240 96a8 8 0 0 1-8 8h-16v16a8 8 0 0 1-16 0v-16h-16a8 8 0 0 1 0-16h16V72a8 8 0 0 1 16 0v16h16a8 8 0 0 1 8 8Zm-96-40h8v8a8 8 0 0 0 16 0v-8h8a8 8 0 0 0 0-16h-8v-8a8 8 0 0 0-16 0v8h-8a8 8 0 0 0 0 16Zm72.77 97a8 8 0 0 1 1.43 8A96 96 0 1 1 95.07 37.8a8 8 0 0 1 10.6 9.06a88.07 88.07 0 0 0 103.47 103.47a8 8 0 0 1 7.63 2.67Zm-19.39 14.88c-1.79.09-3.59.14-5.38.14A104.11 104.11 0 0 1 88 64c0-1.79 0-3.59.14-5.38a80 80 0 1 0 109.24 109.24Z"
@@ -929,7 +940,7 @@ if($val->isSuccess()){
           ></path>
         </symbol>
 
-        <!-- sun line-md-moon-to-sunny-outline-transition -->
+
 
         <symbol id="sun" viewBox="0 0 24 24">
           <path
@@ -937,7 +948,6 @@ if($val->isSuccess()){
             fill="currentColor"
           ></path>
         </symbol>
-        <!-- plus  -->
         <symbol
           aria-hidden="true"
           id="plus"
@@ -951,12 +961,9 @@ if($val->isSuccess()){
             fill="currentColor"
           ></path>
         </symbol>
-        <!-- minus  mdi-minus -->
-
         <symbol id="minus" viewBox="0 0 24 24">
           <path d="M19 13H5v-2h14v2Z" fill="currentColor"></path>
         </symbol>
-        <!-- trash solar-trash-bin-trash-broken -->
         <symbol id="trash" viewBox="0 0 24 24">
           <g fill="none" stroke="currentColor" stroke-width="1.5">
             <path

@@ -1,57 +1,67 @@
 <?php
+// Include the loader file which might contain necessary configurations and initializations
 include 'config/loader.php';
 
+// Check if the 'namefull' and 'mobile' cookies are set, and if so, redirect to the index page
 if(isset($_COOKIE['namefull']) && isset($_COOKIE['mobile'])){
   redirect("index.php");
 }
 
+// Prepare SQL query to find the user by the reset token
 $sql = "SELECT * FROM users WHERE reset_token = ?";
 $stmt = $db->prepare($sql);
 $stmt->bind_param("s", $_GET['token']);
 $stmt->execute();
 $result = $stmt->get_result();
 
-if(!isset($_GET['token']) || strlen($_GET['token'] != 16) || $result->num_rows == 0){
+// Check if the token is not set, has an invalid length, or doesn't match any user
+if(!isset($_GET['token']) || strlen($_GET['token']) != 16 || $result->num_rows == 0){
+  // If any condition fails, redirect to the login page
   redirect("login.php");
 }
 
+// Check if the password reset form is submitted
 if(isset($_POST['forgotpasssubmit'])){
 
+  // Include the Validation helper for form validation
   require('helpers/Validation.php');
-$val = new Validation();
-$password = htmlspecialchars($_POST['password']);
-$passwordconf = htmlspecialchars($_POST['passwordconf']);
+  $val = new Validation();
+  $password = htmlspecialchars($_POST['password']);
+  $passwordconf = htmlspecialchars($_POST['passwordconf']);
 
-
-  // Validation for password
+  // Validate the new password
   $val->name('رمز عبور')
       ->value($password)
-      ->min("8")
-      ->max("20")
-      ->required();
+      ->min(8) // Minimum length of 8 characters
+      ->max(20) // Maximum length of 20 characters
+      ->required(); // Field is required
 
-        // Validation for password
+  // Validate the confirmation password
   $val->name('تکرار رمز عبور')
-  ->value($passwordconf)
-  ->min("8")
-  ->max("20")
-  ->equal($password)
-  ->required();
+      ->value($passwordconf)
+      ->min(8) // Minimum length of 8 characters
+      ->max(20) // Maximum length of 20 characters
+      ->equal($password) // Must match the original password
+      ->required(); // Field is required
 
+  // If validation is successful
   if($val->isSuccess()){
-
-    $token = $_POST['token'];
+    $token = $_POST['token']; // Get the token from the form
+    // Hash the new password
     $new_password = password_hash($_POST['password'], PASSWORD_DEFAULT);
 
+    // Update the user's password and reset the token
     $sql = "UPDATE users SET password = ?, reset_token = NULL WHERE reset_token = ?";
     $stmt = $db->prepare($sql);
     $stmt->bind_param("ss", $new_password, $token);
     $stmt->execute();
 
+    // Set a success message
     $_SESSION['success'] = 'رمز عبور شما با موفقیت تغییر کرد';
-  }else{
-  $_SESSION['error'] = $val->displayError();
-}
+  } else {
+    // If validation fails, store the error message in the session
+    $_SESSION['error'] = $val->displayError();
+  }
 }
 
 ?>

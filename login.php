@@ -1,66 +1,81 @@
 <?php
+// Include the loader file which might contain necessary configurations and initializations
 include 'config/loader.php';
 
+// Check if the 'namefull' and 'mobile' cookies are set, and if so, redirect to the index page
 if(isset($_COOKIE['namefull']) && isset($_COOKIE['mobile'])){
   redirect("index.php");
 }
 
+// Check if the login form is submitted
 if (isset($_POST['loginsubmit'])) {
+  // Include the Validation helper for form validation
   require('helpers/Validation.php');
   $val = new Validation();
   $mobile = htmlspecialchars($_POST['mobile']);
   $password = htmlspecialchars($_POST['password']);
 
-  // Validation for mobile
+  // Validate the mobile number
   $val->name('شماره موبایل')
       ->value($mobile)
-      ->pattern('tel')
-      ->min(11)
-      ->max(11)
-      ->required();
+      ->pattern('tel') // Ensure the value matches a telephone pattern
+      ->min(11) // Minimum length of 11 characters
+      ->max(11) // Maximum length of 11 characters
+      ->required(); // Field is required
 
-  // Validation for password
+  // Validate the password
   $val->name('رمز عبور')
       ->value($password)
-      ->min("8")
-      ->max("20")
-      ->required();
+      ->min(8) // Minimum length of 8 characters
+      ->max(20) // Maximum length of 20 characters
+      ->required(); // Field is required
 
+  // If validation is successful
   if ($val->isSuccess()) {
+      // Prepare an SQL statement to find the user by mobile number
       $stmt = $db->prepare("SELECT * FROM users WHERE mobile = ?");
       if ($stmt === false) {
+          // Handle preparation failure
           die('Prepare failed: ' . htmlspecialchars($db->error));
       }
 
+      // Bind parameters and execute the statement
       $stmt->bind_param("s", $mobile);
       if (!$stmt->execute()) {
+          // Handle execution failure
           die('Execute failed: ' . htmlspecialchars($stmt->error));
       }
 
+      // Get the result set
       $result = $stmt->get_result();
       if ($result->num_rows > 0) {
           if ($row = $result->fetch_assoc()) {
               // Verify the password
               if (password_verify($password, $row['password'])) {
-                  $cookieExpiration = time() + 2592000; // 1 month
+                  $cookieExpiration = time() + 2592000; // Set cookie expiration to 1 month
 
+                  // Set cookies for the user's full name and mobile number
                   setcookie('namefull', $row['namefull'], $cookieExpiration, '/');
                   setcookie('mobile', $row['mobile'], $cookieExpiration, '/');
-                  // It is not secure to store passwords in cookies
 
+                  // Redirect to the index page after successful login
                   header("Location: index.php");
                   exit;
               } else {
+                  // Set an error message if the password is incorrect
                   $_SESSION['error'] = 'شماره موبایل یا رمز عبور اشتباه است';
               }
           }
       } else {
+          // Set an error message if the mobile number is not found
           $_SESSION['error'] = 'شماره موبایل یا رمز عبور اشتباه است';
       }
   } else {
+      // Set an error message if validation fails
       $_SESSION['error'] = $val->displayError();
   }
 }
+
 ?>
 <!DOCTYPE html>
 <html dir="rtl" lang="fa">

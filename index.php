@@ -3,8 +3,6 @@ include 'config/loader.php';
 if(!isset($_COOKIE['namefull']) && !isset($_COOKIE['mobile'])){
     redirect("login.php");
   }
-
-
 ?>
 <!DOCTYPE html>
 <html lang="en">

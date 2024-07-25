@@ -1,90 +1,105 @@
 <?php
+// Include necessary configuration and validation files
 include 'config/loader.php';
 include 'helpers/validation.php';
+
+// Instantiate the validation class
 $val = new Validation();
 
+// Check if the 'namefull' and 'mobile' cookies are set, and if so, redirect to the index page
 if(isset($_COOKIE['namefull']) && isset($_COOKIE['mobile'])){
   redirect("index.php");
 }
 
+// Default button text for the form
+$buttontext = 'ارسال کد تایید'; // "Send Verification Code"
 
-$buttontext='ارسال کد تایید';
+if (isset($_POST['submitbtn']) && !isset($_POST['code'])) {
+  // If the submit button is clicked and the verification code is not set
 
-if (isset($_POST['submitbtn']) && isset($_POST['code'])==false){
-
-  $namefull = htmlspecialchars($_POST['namefull']);  
-  $mobile= htmlspecialchars($_POST['mobile']);
+  // Sanitize user input
+  $namefull = htmlspecialchars($_POST['namefull']);
+  $mobile = htmlspecialchars($_POST['mobile']);
   $password = htmlspecialchars($_POST['password']);
-    
 
+  // Validate the full name
   $val->name('نام و نام خانوادگی')
-        ->value($namefull)
-        ->min(3)
-        ->max(30)
-        ->required();
+      ->value($namefull)
+      ->min(3)
+      ->max(30)
+      ->required();
 
-    $val->name('شماره موبایل')
-    ->value($mobile)
-    ->pattern('tel')
-    ->min(11)
-    ->max(11)
-    ->required()
-    ->uniq("users","mobile",$mobile);
+  // Validate the mobile number
+  $val->name('شماره موبایل')
+      ->value($mobile)
+      ->pattern('tel')
+      ->min(11)
+      ->max(11)
+      ->required()
+      ->uniq("users", "mobile", $mobile); // Ensure mobile number is unique
 
-    $val->name('رمز عبور')
-        ->value($password)
-        ->min(8)
-        ->max(15)
-        ->required();
+  // Validate the password
+  $val->name('رمز عبور')
+      ->value($password)
+      ->min(8)
+      ->max(15)
+      ->required();
 
-      if($val->isSuccess()){
+  if($val->isSuccess()) {
+      // If validation passes, generate a random verification code
+      $code = random_int(1000, 9999);
 
-    $code=random_int(1000,9999);
-    
-    $stmt = $db->prepare("INSERT INTO smscode (mobile, smscode) VALUES (?, ?)");
-    $stmt->bind_param('ss', $mobile, $code);
-    $stmt->execute();    
-    $coderesult = $stmt->get_result();
-    
-// SEND SMS CODE
+      // Insert the mobile number and verification code into the smscode table
+      $stmt = $db->prepare("INSERT INTO smscode (mobile, smscode) VALUES (?, ?)");
+      $stmt->bind_param('ss', $mobile, $code);
+      $stmt->execute();
+      $coderesult = $stmt->get_result();
+      
+      // SEND SMS CODE (code to send the SMS should be implemented here)
 
+  } else {
+      // Store validation errors in the session
+      $_SESSION['error'] = $val->displayError();
+  }
 
-      }else{
-        $_SESSION['error'] = $val->displayError();
-      }
-
-
-
-    $buttontext='ثبت نام';
+  // Update button text to indicate registration
+  $buttontext = 'ثبت نام'; // "Register"
 }
 
+if (isset($_POST['mobile']) && isset($_POST['code']) && strlen($_POST['code']) == 4) {
+  // If the mobile number and verification code are set and the code is 4 digits long
 
-if (isset($_POST['mobile']) && isset($_POST['code']) && strlen($_POST['code'])==4){
+  // Sanitize user input
+  $namefull = htmlspecialchars($_POST['namefull']);
+  $mobile = htmlspecialchars($_POST['mobile']);
+  $password = htmlspecialchars($_POST['password']);
+  $code = htmlspecialchars($_POST['code']);
+  $code_org = '';
 
-    $namefull = htmlspecialchars($_POST['namefull']);  
-    $mobile= htmlspecialchars($_POST['mobile']);
-    $password = htmlspecialchars($_POST['password']);
-    $code=htmlspecialchars($_POST['code']);
-    $code_org='';
+  // Retrieve the most recent verification code from the database for the given mobile number
+  $stmt2 = $db->prepare("SELECT * FROM smscode WHERE mobile = ? ORDER BY id DESC LIMIT 1");
+  $stmt2->bind_param('s', $mobile);
+  $stmt2->execute();
+  $selectres = $stmt2->get_result();
 
-$stmt2 = $db->prepare("select * from smscode where mobile = ? order by id desc limit 1");
-$stmt2->bind_param('s',$mobile);
-$stmt2->execute();
-$selectres = $stmt2->get_result();
+  if ($row = $selectres->fetch_assoc()) {
+      $code_org = $row['smscode']; // Retrieve the original code
+  }
 
-if ($row=$selectres->fetch_assoc()){
-    $code_org=$row['smscode'];
-}
-
-if ($code_org == $code && $val->isSuccess()){
-    $hashed_password = password_hash($password, PASSWORD_DEFAULT);
-    $sql = $db->prepare("insert into users (namefull, mobile, password) values (?,?,?)");
-    $sql->bind_param('sss', $namefull, $mobile, $hashed_password);
-    $sql->execute();
-    $_SESSION['success'] = 'با موفقیت ثبت نام شدید';
-}else{
-    $_SESSION['error'] = 'کد وارد شده اشتباه است';
-}
+  // If the entered code matches the original code and the validation is successful
+  if ($code_org == $code && $val->isSuccess()) {
+      // Hash the password and insert the user data into the users table
+      $hashed_password = password_hash($password, PASSWORD_DEFAULT);
+      $sql = $db->prepare("INSERT INTO users (namefull, mobile, password) VALUES (?,?,?)");
+      $sql->bind_param('sss', $namefull, $mobile, $hashed_password);
+      $sql->execute();
+      
+      // Store success message in the session
+      $_SESSION['success'] = 'با موفقیت ثبت نام شدید'; // "Registration successful"
+  } else {
+      // Store error message in the session if the codes do not match
+      $_SESSION['error'] = 'کد وارد شده اشتباه است'; // "The entered code is incorrect"
+  }
 }
 ?>
 <!DOCTYPE html>
