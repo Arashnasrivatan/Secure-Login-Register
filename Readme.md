@@ -1,8 +1,8 @@
 # Secure Login Register🔒
 
-Secure Login, Registration, and Password Recovery Project in Persian 🎯🔒
+Secure Login, Registration, and Password Recovery Project in **Persian** and **English** 🎯🔒
 
-In this project, a complete system for secure login, registration, and password recovery has been implemented in Persian. The system includes the following sections:
+In this project, a complete system for secure login, registration, and password recovery has been implemented in **Persian** and **English**. The system includes the following sections:
 
 1. **Registration** ✍️🆕: Users can create an account by entering their personal information, such as name, mobile number 📱, and a strong password 🔑.
 2. **Login** 🔓👤: Users can log in to their accounts by entering their mobile number and password.
