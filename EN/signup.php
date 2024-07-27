@@ -108,7 +108,7 @@ if (isset($_POST['mobile']) && isset($_POST['code']) && strlen($_POST['code']) =
 <head>
     <meta charset="UTF-8" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
-    <title>ثبت نام</title>
+    <title>Register</title>
 
     <link href="./assets/css/fonts.css" rel="stylesheet" />
     <link href="./assets/css/app.css" rel="stylesheet" />
