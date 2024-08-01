@@ -77,7 +77,7 @@ $_SESSION['error'] = $val->displayError();
 
 ?>
 <!DOCTYPE html>
-<html dir="rtl" lang="fa">
+<html dir="ltr" lang="en">
 
 <head>
     <meta charset="UTF-8" />
@@ -721,9 +721,9 @@ $_SESSION['error'] = $val->displayError();
                         <button type="submit" name="loginsubmit" class="btn-primary w-full py-3">Login</button>
                     </div>
                     <p class="text-center text-sm text-text/90 mb-4">
+                        Did you forget your
                         <a href="./forgot.php" class="text-primary">
-                            Password</a>
-                        Did you forget yourself?
+                            Password ?</a>
                     </p>
                     <p class="text-center text-sm text-text/90">
                         Don't have an account?

@@ -51,7 +51,7 @@ $_SESSION['error'] = $val->displayError();
 
 ?>
 <!doctype html>
-<html dir="rtl" lang="fa">
+<html dir="ltr" lang="en">
 
 <head>
     <meta charset="UTF-8" />
@@ -685,7 +685,7 @@ $_SESSION['error'] = $val->displayError();
                         </label>
                     </div>
                     <div>
-                        <button type="submit" name="forgotsubmit" class="btn-primary w-full py-3">Word Recovery
+                        <button type="submit" name="forgotsubmit" class="btn-primary w-full py-3">Recovery
                             pass</button>
                     </div>
                 </div>

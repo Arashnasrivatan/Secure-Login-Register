@@ -65,7 +65,7 @@ $_SESSION['error'] = $val->displayError();
 
 ?>
 <!doctype html>
-<html dir="rtl" lang="fa">
+<html dir="ltr" lang="en">
 
 <head>
     <meta charset="UTF-8" />
