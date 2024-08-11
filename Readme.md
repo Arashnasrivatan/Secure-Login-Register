@@ -27,4 +27,5 @@ This project ensures that all user data is handled securely 🔐, and includes f
 - **Login** 💎
 - **Sign up** 💎
 - **Reset password with SMS** 📱🔄
+- **Forgot password with reset link 🔒**
 - **Validation PHP Class** 💻✅
