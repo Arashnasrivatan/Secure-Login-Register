@@ -63,11 +63,13 @@ exit;
 } else {
 // Set an error message if the password is incorrect
 $_SESSION['error'] = 'The mobile number or password is wrong';
+    logFailedAttempt($ipAddress);
 }
 }
 } else {
 // Set an error message if the mobile number is not found
 $_SESSION['error'] = 'The mobile number or password is wrong';
+    logFailedAttempt($ipAddress);
 }
 } else {
 // Set an error message if validation fails
