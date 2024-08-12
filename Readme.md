@@ -29,3 +29,4 @@ This project ensures that all user data is handled securely 🔐, and includes f
 - **Reset password with SMS** 📱🔄
 - **Forgot password with reset link 🔒**
 - **Validation PHP Class** 💻✅
+- **IP Block system**
