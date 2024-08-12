@@ -54,6 +54,9 @@ if (isset($_POST['loginsubmit'])) {
               if (password_verify($password, $row['password'])) {
                   $cookieExpiration = time() + 2592000; // Set cookie expiration to 1 month
 
+                  $stmt = $db->prepare('DELETE FROM ip_tracking WHERE ip_address = ?');
+                  $stmt->execute([$ipAddress]);
+
                   // Set cookies for the user's full name and mobile number
                   setcookie('namefull', $row['namefull'], $cookieExpiration, '/');
                   setcookie('mobile', $row['mobile'], $cookieExpiration, '/');
@@ -64,11 +67,13 @@ if (isset($_POST['loginsubmit'])) {
               } else {
                   // Set an error message if the password is incorrect
                   $_SESSION['error'] = 'شماره موبایل یا رمز عبور اشتباه است';
+                  logFailedAttempt($ipAddress);
               }
           }
       } else {
           // Set an error message if the mobile number is not found
           $_SESSION['error'] = 'شماره موبایل یا رمز عبور اشتباه است';
+          logFailedAttempt($ipAddress);
       }
   } else {
       // Set an error message if validation fails
